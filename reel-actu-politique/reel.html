@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<style>
+  :root{--bg:#0d1017;--ink:#f5f3ee;--muted:#9aa3b2;--accent:#ffd23f;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg);font-family:Inter,sans-serif;color:var(--ink)}
+  #stage{position:relative;width:1080px;height:1920px;overflow:hidden}
+  .blob{position:absolute;border-radius:50%;filter:blur(120px);opacity:.55}
+  #b1{width:900px;height:900px;background:#2b3a8f}
+  #b2{width:800px;height:800px;background:#7a1f3d}
+  #grain{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 2px,transparent 2px 4px)}
+  #topbar{position:absolute;top:110px;left:80px;right:80px;display:flex;gap:14px}
+  .seg{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.18);overflow:hidden}
+  .seg i{display:block;height:100%;width:0;background:var(--accent)}
+  #brand{position:absolute;top:160px;left:80px;font-weight:800;font-size:34px;letter-spacing:.12em;color:var(--muted)}
+  #brand b{color:var(--accent)}
+  .scene{position:absolute;left:80px;right:80px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;opacity:0}
+  .tag{align-self:flex-start;background:var(--accent);color:#111;font-weight:800;font-size:38px;letter-spacing:.06em;padding:14px 28px;border-radius:10px;margin-bottom:48px}
+  .num{font-family:'JetBrains Mono',monospace;font-size:40px;color:var(--muted);margin-bottom:22px}
+  h1{font-family:'Inter Display',Inter,sans-serif;font-weight:900;font-size:112px;line-height:1.02;letter-spacing:-.02em}
+  h1 .w{display:inline-block;margin-right:.22em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .sub{margin-top:48px;font-size:50px;line-height:1.3;font-weight:500;color:#d9dce3}
+  .src{margin-top:56px;font-size:32px;color:var(--muted);font-weight:500}
+  .rule{height:6px;width:0;background:var(--accent);margin-top:48px;border-radius:3px}
+  #intro h1{font-size:150px}
+  #outro h1{font-size:104px}
+</style></head><body>
+<div id="stage">
+  <div class="blob" id="b1"></div><div class="blob" id="b2"></div><div id="grain"></div>
+  <div id="topbar"></div>
+  <div id="brand">L'ACTU <b>•</b> EN 20 S</div>
+
+  <div class="scene" id="intro" data-s="0" data-e="2.6">
+    <div class="tag">CETTE SEMAINE</div>
+    <h1>L'actu <em>politique</em> en 20 secondes</h1>
+    <div class="rule"></div>
+    <div class="sub">Semaine du 9 au 13 novembre 2026</div>
+  </div>
+
+  <div class="scene" data-s="2.6" data-e="6.4" data-n="1">
+    <div class="num">01 / 04</div>
+    <div class="tag">PRÉSIDENTIELLE 2027</div>
+    <h1>Retailleau propose une <em>primaire</em> droite-centre</h1>
+    <div class="sub">Dates avancées : 31 janvier et 7 février.</div>
+    <div class="src">Source : LCP</div>
+  </div>
+
+  <div class="scene" data-s="6.4" data-e="10.2" data-n="2">
+    <div class="num">02 / 04</div>
+    <div class="tag">GAUCHE</div>
+    <h1>Mélenchon en <em>meeting</em> au Bourget</h1>
+    <div class="sub">Le candidat LFI a réuni ses soutiens le 7 novembre.</div>
+    <div class="src">Source : franceinfo</div>
+  </div>
+
+  <div class="scene" data-s="10.2" data-e="14.0" data-n="3">
+    <div class="num">03 / 04</div>
+    <div class="tag">SOCIAL</div>
+    <h1>Grève dans la <em>fonction publique</em> le 17 novembre</h1>
+    <div class="sub">Appel de l'intersyndicale ; la CGT veut élargir la mobilisation.</div>
+    <div class="src">Source : franceinfo</div>
+  </div>
+
+  <div class="scene" data-s="14.0" data-e="17.8" data-n="4">
+    <div class="num">04 / 04</div>
+    <div class="tag">ASSEMBLÉE</div>
+    <h1>Les plateformes devront mieux <em>payer la presse</em></h1>
+    <div class="sub">Les députés ont voté le texte visant les grandes plateformes numériques.</div>
+    <div class="src">Source : LCP</div>
+  </div>
+
+  <div class="scene" id="outro" data-s="17.8" data-e="20.5">
+    <h1>Et vous, quel sujet vous <em>marque</em> le plus ?</h1>
+    <div class="rule"></div>
+    <div class="sub">Abonnez-vous pour l'actu de la semaine prochaine.</div>
+  </div>
+</div>
+<script>
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const easeOut=x=>1-Math.pow(1-clamp(x),3);
+const easeIn=x=>Math.pow(clamp(x),3);
+const scenes=[...document.querySelectorAll('.scene')];
+// split headlines into words (keep <em> words highlighted)
+scenes.forEach(sc=>{const h=sc.querySelector('h1');const out=[];
+  h.childNodes.forEach(n=>{const isEm=n.nodeName==='EM';
+    n.textContent.split(/\s+/).filter(Boolean).forEach(w=>out.push(isEm?`<em class="w">${w}</em>`:`<span class="w">${w}</span>`));});
+  h.innerHTML=out.join(' ');});
+const items=scenes.filter(s=>s.dataset.n);
+const bar=document.getElementById('topbar');
+items.forEach(()=>{const d=document.createElement('div');d.className='seg';d.innerHTML='<i></i>';bar.appendChild(d)});
+const segs=[...bar.querySelectorAll('i')];
+window.renderAt=function(t){
+  const b1=document.getElementById('b1'),b2=document.getElementById('b2');
+  b1.style.transform=`translate(${-250+Math.sin(t*.35)*160}px,${200+Math.cos(t*.27)*140}px)`;
+  b2.style.transform=`translate(${450+Math.cos(t*.3)*170}px,${1100+Math.sin(t*.22)*160}px)`;
+  scenes.forEach(sc=>{const s=+sc.dataset.s,e=+sc.dataset.e;
+    const inP=easeOut((t-s)/.45), outP=easeIn((t-(e-.35))/.35);
+    const vis=t>=s-0.01&&t<=e;
+    sc.style.opacity=vis?(inP*(1-outP)):0;
+    sc.style.transform=`translateY(${(1-inP)*60-outP*80}px)`;
+    sc.querySelectorAll('h1 .w').forEach((w,i)=>{const p=easeOut((t-s-.12-i*.06)/.4);
+      w.style.opacity=p;w.style.transform=`translateY(${(1-p)*50}px)`;});
+    const tag=sc.querySelector('.tag');if(tag){const p=easeOut((t-s)/.35);tag.style.transform=`scale(${.8+.2*p})`;tag.style.transformOrigin='left center'}
+    sc.querySelectorAll('.sub,.src').forEach((el,i)=>{const p=easeOut((t-s-.6-i*.15)/.45);el.style.opacity=p;el.style.transform=`translateY(${(1-p)*30}px)`;});
+    const r=sc.querySelector('.rule');if(r)r.style.width=(easeOut((t-s-.4)/.8)*360)+'px';
+  });
+  items.forEach((sc,i)=>{const s=+sc.dataset.s,e=+sc.dataset.e;segs[i].style.width=(clamp((t-s)/(e-s))*100)+'%';});
+  const fade=clamp(t/0.3)*(1-clamp((t-19.6)/0.4));
+  document.getElementById('stage').style.opacity=fade;
+};
+window.renderAt(0);
+</script></body></html>
